@@ -1,11 +1,18 @@
 # IP-Subnet
 
-This is a simple tool that returns the total number of IP addresses available within a
-particular subnet mask.
+This is a simple tool that unmasks a network ID, returns the IP class and total number
+of IP addresses available within a particular subnet mask.
 
-Usage:
-=>ip-subnet [--ip-addr]: This flags accepts drops 2 input lines that take an IP address
-and subnet mask in decimal form
+usage: ip_subnet.py [-h]
+                    [-i IP_AND_SUBNETMASK IP_AND_SUBNETMASK | -c EXTENDED_NETWORK_PREFIX | --version]
 
-=>ip-subnet [--cidr-addr]: Drops an inputline that accepts an IP and subnet mask in CIDR notation
+optional arguments:
+  -h, --help            show this help message and exit
+  -i IP_AND_SUBNETMASK IP_AND_SUBNETMASK
+                        Accepts an ip adress with subnet mask in subnet
+                        notation ip_subnet -i 255.255.255.0
+  -c EXTENDED_NETWORK_PREFIX
+                        Accepts subnet mask in extended prefix notation. i.e
+                        192.168.0.22/24
+  --version             show program's version number and exit
 
