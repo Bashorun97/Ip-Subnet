@@ -45,11 +45,14 @@ class Subnet:
       return f'Incorrect IP class'
       sys.exit()
 
-def cidr_to_decimal_converter(ip_in_cidr_notation):
-  ip_addr_list = ip_in_cidr_notation.split('/')
-  network_prefix = ip_addr_list[0]
-  cidr = ip_addr_list.pop()
-  subnet_mask = '1'*int(cidr) + (32-int(cidr))*'0'
+
+# NB: Network prefix is the same as CIDR (Classless Inter-Domain Range)
+# Converts to decimal notation from network prefix notation or CIDR
+def prefix_to_decimal_converter(ip_in_prefix_notation):
+  ip_addr_list = ip_in_prefix_notation.split('/')
+  network_id = ip_addr_list[0]
+  network_prefix = ip_addr_list.pop()
+  subnet_mask = '1'*int(network_prefix) + (32-int(network_prefix))*'0'
   first_octet = subnet_mask[:8]
   second_octet = subnet_mask[8:16]
   third_octet = subnet_mask[16:24]
@@ -57,28 +60,30 @@ def cidr_to_decimal_converter(ip_in_cidr_notation):
   subnet_list = [octet_mapping[int(first_octet)], octet_mapping[int(second_octet)],\
   octet_mapping[int(third_octet)], octet_mapping[int(fourth_octet)]]
   subnet = '.'.join(subnet_list)
-  return network_prefix, subnet
+  return network_id, subnet
+
 
 def argparse_unpacker():
   parsed = parser.arg_parser()
 
-  # Unpacks extended network prefix into network prefix and subnet mask
-  extended_network_prefix = parsed.extended_network_prefix
-
- # Unpacks a list of network IP and subnetmask in decimal notation (e.g. 255.255.255.0)
+  network_prefix = parsed.network_prefix
   ip_and_subnetwork = parsed.ip_and_subnetmask
 
-  if extended_network_prefix is not None:
-    netwr_prefix_subnet = cidr_to_decimal_converter(extended_network_prefix)
-    return netwr_prefix_subnet
+  if network_prefix is not None:
+    network_id_and_subnet = prefix_to_decimal_converter(network_prefix)
+    return network_id_and_subnet
   elif ip_and_subnetwork is not None:
-    netwr_prefix_subnet = tuple(ip_and_subnetwork)
-    return netwr_prefix_subnet
+    network_id_and_subnet = tuple(ip_and_subnetwork)
+    return network_id_and_subnet
+
 
 if __name__ == '__main__':
   argparse_unpacker()
   subnet_node = Subnet()
+
+  # Unpacks returned values of argparse_unpacker() into network id and subnet mask
   ip, subnet = argparse_unpacker()
+
   network_id = subnet_node.get_network_id(ip, subnet)
   print(network_id)
   ip_address_class = subnet_node.ip_class(ip)
