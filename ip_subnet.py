@@ -110,18 +110,16 @@ class CreateSubnetwork(Subnet):
 
     else:
       # Host quantity
-      quantity = 32 - math.log2(kwargs['host_quantity'])
-      extended_network_address = [network_id, str(math.floor(quantity))]
+      quantity = math.floor(32 - math.log2(kwargs['host_quantity']))
+      extended_network_address = [network_id, str(quantity)]
 
     # new_cidr depending on the outcome of preceding control structure
     new_cidr = '/'.join(extended_network_address)
     child_addr, parent_addr = map(prefix_to_decimal_converter, (new_cidr, kwargs['parent_addr']))
     parent_net = self.get_network_id(parent_addr[0], parent_addr[1])
     child_net = self.get_network_id(child_addr[0], child_addr[1])
-    
-    # extended_subnet_bits = [bin(octet).strip('0b') for octet in extended_network_address]
-
-    network_metadata = {'parent_addr':parent_net, 'child_addr':child_net}
+    subnet_bits = 2**(quantity - cidr)
+    network_metadata = {'parent_addr':parent_net, 'child_addr':child_net, 'subnet_bits':subnet_bits}
     return network_metadata
 
   def generate_addresses(self, args):
@@ -215,6 +213,7 @@ if __name__ == '__main__':
       metadata = create.generate_metadata(host_quantity=host_quantity, parent_addr=network_prefix)
       parent = metadata['parent_addr']
       child = metadata['child_addr']
+      subnet_bits = metadata['subnet_bits']
       
       parent_mask = str_serializer(parent['subnet_mask'])
       child_mask = str_serializer(child['subnet_mask'])
@@ -222,7 +221,7 @@ if __name__ == '__main__':
       parent_ip = create.generate_addresses(parent_mask)
       child_ip = create.generate_addresses(child_mask)
       print(f"Base Network ID of {parent['network_id']} => {parent_ip} Hosts")
-      print(f'{child_ip} newly created hosts defined within xx Subnetworks')
+      print(f'{child_ip} newly created hosts defined within {subnet_bits} Subnetworks')
 
   else:
     print(ip_address_class)
