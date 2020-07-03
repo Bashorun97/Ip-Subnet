@@ -1,18 +1,42 @@
 # IP-Subnet
 
-This is a simple tool that unmasks a network ID, returns the IP class and total number
-of IP addresses available within a particular subnet mask.
+This is a cli tool that performs common operations on IP addresses and associated subnet masks.
 
+# Set up
+For Unix/Linux systems
+Ensure you have Python3+ installed
+
+git clone
+Open run.sh and modify `/your/path` to your's
+Run `run.sh`
+
+# Usage
 usage: ip_subnet.py [-h]
-                    [-i IP_AND_SUBNETMASK IP_AND_SUBNETMASK | -c EXTENDED_NETWORK_PREFIX | --version]
-
+                    [-i IP_AND_SUBNETMASK IP_AND_SUBNETMASK | -c NETWORK_PREFIX | --version]
+                    [--create-subnets CREATE_SUBNETS] [--create-hosts CREATE_HOSTS]
+                    
 optional arguments:
   -h, --help            show this help message and exit
   -i IP_AND_SUBNETMASK IP_AND_SUBNETMASK
                         Accepts an ip adress with subnet mask in subnet
-                        notation ip_subnet -i 255.255.255.0
-  -c EXTENDED_NETWORK_PREFIX
-                        Accepts subnet mask in extended prefix notation. i.e
-                        192.168.0.22/24
+                        notation ./ip_subnet -i 255.255.255.0
+  -c NETWORK_PREFIX
+                        Accepts subnet mask in network prefix notation. i.e
+                        ./ip_subnet -c192.168.0.22/24
+  --create-subnets
+  --create-hosts 
   --version             show program's version number and exit
 
+Usage 1: Retrieving total number of IP addresses in a subnet mask
+  Using CIDR notation: ./ip_subnet.py -c 192.68.73.1/232
+  Using Decimal notation: ./ip_subnet.py -i 192.168.73.1 255.255.255.0
+  
+Usage 2: Create N subnets or hosts.
+  NB: Ensure that N is a power of 2 within 0-255. e.g, 2, 4, 8... I'm trusting you to input correct N
+      Subnets and hosts can only be created by inputing the address and masks in CIDR. Support for decimal should come soon.
+      
+      ./ip_subnet.py --create-subnets 8 -c 192.68.73.1/24
+      ./ip_subnet.py --create-hosts 128 -c 140.25.0.0/16
+
+Other things to note:
+Network Prefix is same as CIDR (Classless Inter-Domain Range)
