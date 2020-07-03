@@ -107,18 +107,19 @@ class CreateSubnetwork(Subnet):
       added_bits = math.log2(kwargs['sub_quantity'])
       sub = str(math.floor(sum([cidr, added_bits])))
       extended_network_address = [network_id, sub]
+      subnet_bits = 0
 
     else:
       # Host quantity
       quantity = math.floor(32 - math.log2(kwargs['host_quantity']))
       extended_network_address = [network_id, str(quantity)]
+      subnet_bits = 2**(quantity - cidr)
 
     # new_cidr depending on the outcome of preceding control structure
     new_cidr = '/'.join(extended_network_address)
     child_addr, parent_addr = map(prefix_to_decimal_converter, (new_cidr, kwargs['parent_addr']))
     parent_net = self.get_network_id(parent_addr[0], parent_addr[1])
     child_net = self.get_network_id(child_addr[0], child_addr[1])
-    subnet_bits = 2**(quantity - cidr)
     network_metadata = {'parent_addr':parent_net, 'child_addr':child_net, 'subnet_bits':subnet_bits}
     return network_metadata
 
@@ -153,7 +154,6 @@ def argparse_unpacker(parse_object=None):
     host_info = tuple(create_hosts)
     keyword_map['create_hosts'] = host_info
 
-
   return keyword_map
 
 
@@ -173,13 +173,17 @@ if __name__ == '__main__':
   # Unpacks keyword_map into args_map
   args_map = argparse_unpacker(parse_object)
 
+  if len(args_map) == 0:
+    print(f'FlagError: Enter a flag')
+    sys.exit()
+
   # Gracefully handles the exception of passing one flag
   try:
     network_prefix = args_map['network_prefix']
     net, submask = prefix_to_decimal_converter(network_prefix)
   except KeyError:
     net, submask = args_map['ip_and_subnetmask']
-  
+
   ip_address_class = subnet_node.ip_class(net)
   network_info = subnet_node.get_network_id(net, submask)
   available_ip = subnet_node.subnet_ip_addresses(submask)
