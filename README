@@ -10,6 +10,10 @@ git clone
 Open run.sh and modify `/your/path` to your's
 Run `run.sh`
 
+Change directory to the project folder.
+Make `ip_subnet.py` file executable by doing:
+`sudo chmod +x ip_subnet.py`
+
 # Usage
 usage: ip_subnet.py [-h]
                     [-i IP_AND_SUBNETMASK IP_AND_SUBNETMASK | -c NETWORK_PREFIX | --version]
